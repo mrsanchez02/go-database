@@ -98,25 +98,43 @@ if err != nil {
 ## Create an invoice
 
 ```go
-storageHeader := storage.NewPsqlInvoiceHeader(storage.Pool())
-storageItems := storage.NewPsqlInvoiceItem(storage.Pool())
-storageInvoice := storage.NewPsqlInvoice(
- storage.Pool(),
- storageHeader,
- storageItems,
+storageHeader := storage.NewMySQLInvoiceHeader(storage.Pool())
+storageItems := storage.NewMySQLInvoiceItem(storage.Pool())
+storageInvoice := storage.NewMySQLInvoice(
+  storage.Pool(),
+  storageHeader,
+  storageItems,
 )
 
 m := &invoice.Model{
- Header: &invoiceheader.Model{
-  Client: "Eddy Abreu",
- },
- Items: invoiceitem.Models{
- &invoiceitem.Model{ProductID: 1},
- },
+  Header: &invoiceheader.Model{
+    Client: "Jose Sanchez",
+  },
+  Items: invoiceitem.Models{
+    &invoiceitem.Model{ProductID: 2},
+    &invoiceitem.Model{ProductID: 2},
+  },
 }
 
 serviceInvoice := invoice.NewService(storageInvoice)
 if err := serviceInvoice.Create(m); err != nil {
- log.Fatalf("invoice.Create: %v", err)
+  log.Fatalf("invoice.Create: %v", err)
 }
+```
+
+## DaoProduct
+
+```go
+driver := storage.MySQL
+storage.New(driver)
+myStorage, err := storage.DAOProduct(driver)
+if err != nil {
+  log.Fatalf("DAOProduct: %v", err)
+}
+serviceProduct := product.NewService(myStorage)
+ms, err := serviceProduct.GetAll()
+if err != nil {
+  log.Fatalf("product.GetAll: %v", err)
+}
+fmt.Println(ms)
 ```

@@ -24,17 +24,17 @@ const (
 )
 
 // MySQLProduct user to work with postgres - product
-type MySQLProduct struct {
+type mySQLProduct struct {
 	db *sql.DB
 }
 
-// NewMySQLProduct return a new pointer of MySQLProduct
-func NewMySQLProduct(db *sql.DB) *MySQLProduct {
-	return &MySQLProduct{db}
+// newMySQLProduct return a new pointer of MySQLProduct
+func newMySQLProduct(db *sql.DB) *mySQLProduct {
+	return &mySQLProduct{db}
 }
 
 // Migrate implement the interface product.Storage
-func (p *MySQLProduct) Migrate() error {
+func (p *mySQLProduct) Migrate() error {
 	smt, err := p.db.Prepare(MySQLMigrateProduct)
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func (p *MySQLProduct) Migrate() error {
 }
 
 // Create implements interface for product.Storage
-func (p *MySQLProduct) Create(m *product.Model) error {
+func (p *mySQLProduct) Create(m *product.Model) error {
 	stmt, err := p.db.Prepare(MySQLCreateProduct)
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func (p *MySQLProduct) Create(m *product.Model) error {
 }
 
 // GetAll implements interface for product.Storage
-func (p *MySQLProduct) GetAll() (product.Models, error) {
+func (p *mySQLProduct) GetAll() (product.Models, error) {
 	stmt, err := p.db.Prepare(psqlGetAllProduct)
 	if err != nil {
 		return nil, err
@@ -107,7 +107,7 @@ func (p *MySQLProduct) GetAll() (product.Models, error) {
 }
 
 // GetByID implement the interface product.Storage
-func (p *MySQLProduct) GetByID(id uint) (*product.Model, error) {
+func (p *mySQLProduct) GetByID(id uint) (*product.Model, error) {
 	smt, err := p.db.Prepare(MySQLGetProductByID)
 	if err != nil {
 		return &product.Model{}, err
@@ -119,7 +119,7 @@ func (p *MySQLProduct) GetByID(id uint) (*product.Model, error) {
 }
 
 // Update implement the interface product.Storage
-func (p *MySQLProduct) Update(m *product.Model) error {
+func (p *mySQLProduct) Update(m *product.Model) error {
 	stmt, err := p.db.Prepare(MySQLUpdateProduct)
 	if err != nil {
 		return err
@@ -150,7 +150,7 @@ func (p *MySQLProduct) Update(m *product.Model) error {
 	return nil
 }
 
-func (p *MySQLProduct) Delete(id uint) error {
+func (p *mySQLProduct) Delete(id uint) error {
 	smt, err := p.db.Prepare(MySQLDeleteProduct)
 	if err != nil {
 		return err

@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
+	"github.com/mrsanchez02/go-database/pkg/product"
 )
 
 var (
@@ -16,7 +17,27 @@ var (
 	once sync.Once
 )
 
-func NewPostgresDB() {
+// Driver of storage
+type Driver string
+
+const (
+	MySQL    Driver = "MYSQL"
+	Postgres Driver = "POSTGRES"
+)
+
+// New create the connection with db
+func New(d Driver) {
+	switch d {
+	case "MYSQL":
+		newMySQLDB()
+	case "POSTGRES":
+		newPostgresDB()
+	default:
+
+	}
+}
+
+func newPostgresDB() {
 	once.Do(func() {
 		var err error
 		db, err = sql.Open("postgres", "postgres://edteam:edteam@localhost:7530/godb?sslmode=disable")
@@ -33,7 +54,7 @@ func NewPostgresDB() {
 
 }
 
-func NewMySQLDB() {
+func newMySQLDB() {
 	once.Do(func() {
 		var err error
 		db, err = sql.Open("mysql", "leandrosc:leandrosc@tcp(localhost:3306)/godb?parseTime=true")
@@ -67,4 +88,16 @@ func timeToNull(t time.Time) sql.NullTime {
 		null.Valid = true
 	}
 	return null
+}
+
+// DAOProduct factory for product.Storage
+func DAOProduct(driver Driver) (product.Storage, error) {
+	switch driver {
+	case Postgres:
+		return newPsqlProduct(db), nil
+	case MySQL:
+		return newMySQLProduct(db), nil
+	default:
+		return nil, fmt.Errorf("Driver not implemented")
+	}
 }
