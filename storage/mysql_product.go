@@ -19,6 +19,8 @@ const (
 	MySQLCreateProduct  = `INSERT INTO products(name, observations, price, created_at) VALUES (?, ?, ?, ?)`
 	MySQLGetAllProduct  = `SELECT id, name, observations, price, created_at, updated_at FROM products`
 	MySQLGetProductByID = MySQLGetAllProduct + " WHERE id = ?"
+	MySQLUpdateProduct  = `UPDATE products SET name = ?, observations = ?, price = ?, updated_at = ? WHERE id = ?`
+	MySQLDeleteProduct  = `DELETE FROM products WHERE id = ?`
 )
 
 // MySQLProduct user to work with postgres - product
@@ -50,7 +52,7 @@ func (p *MySQLProduct) Migrate() error {
 
 // Create implements interface for product.Storage
 func (p *MySQLProduct) Create(m *product.Model) error {
-	stmt, err := p.db.Prepare(MySQLGetAllProduct)
+	stmt, err := p.db.Prepare(MySQLCreateProduct)
 	if err != nil {
 		return err
 	}
@@ -114,4 +116,60 @@ func (p *MySQLProduct) GetByID(id uint) (*product.Model, error) {
 	defer smt.Close()
 
 	return scanRowProduct(smt.QueryRow(id))
+}
+
+// Update implement the interface product.Storage
+func (p *MySQLProduct) Update(m *product.Model) error {
+	stmt, err := p.db.Prepare(MySQLUpdateProduct)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	res, err := stmt.Exec(
+		m.Name,
+		stringToNull(m.Observations),
+		m.Price,
+		timeToNull(m.UpdatedAt),
+		m.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return fmt.Errorf("product with ID %d doesn't exist ", m.ID)
+	}
+
+	fmt.Println("Product updated successfully")
+	return nil
+}
+
+func (p *MySQLProduct) Delete(id uint) error {
+	smt, err := p.db.Prepare(MySQLDeleteProduct)
+	if err != nil {
+		return err
+	}
+	defer smt.Close()
+
+	res, err := smt.Exec(id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return fmt.Errorf("product with ID %d doesn't exist ", id)
+	}
+	fmt.Println("Product deleted successfully")
+	return nil
+
 }

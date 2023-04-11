@@ -65,6 +65,36 @@ if err != nil {
 fmt.Println(ms)
 ```
 
+## Update a Product
+
+```go
+storageProduct := storage.NewMySQLProduct(storage.Pool())
+serviceProduct := product.NewService(storageProduct)
+
+m := &product.Model{
+  ID:    1,
+  Name:  "Curso de CSS",
+  Price: 200,
+}
+err := serviceProduct.Update(m)
+if err != nil {
+  log.Fatalf("product.Update: %v", err)
+}
+```
+
+## Delete a Product
+
+```go
+storageProduct := storage.NewMySQLProduct(storage.Pool())
+serviceProduct := product.NewService(storageProduct)
+
+err := serviceProduct.Delete(3)
+if err != nil {
+ log.Fatalf("product.Delete: %v", err)
+}
+
+```
+
 ## Create an invoice
 
 ```go

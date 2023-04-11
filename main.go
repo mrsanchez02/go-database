@@ -1,9 +1,6 @@
 package main
 
 import (
-	"database/sql"
-	"errors"
-	"fmt"
 	"log"
 
 	"github.com/mrsanchez02/go-database/pkg/product"
@@ -16,14 +13,9 @@ func main() {
 	storageProduct := storage.NewMySQLProduct(storage.Pool())
 	serviceProduct := product.NewService(storageProduct)
 
-	m, err := serviceProduct.GetByID(2)
-	switch {
-	case errors.Is(err, sql.ErrNoRows):
-		fmt.Println("There's no product with this id")
-	case err != nil:
-		log.Fatalf("product.GetByID: %v", err)
-	default:
-		fmt.Println(m)
+	err := serviceProduct.Delete(3)
+	if err != nil {
+		log.Fatalf("product.Delete: %v", err)
 	}
 
 }
