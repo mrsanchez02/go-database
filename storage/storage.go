@@ -36,7 +36,7 @@ func NewPostgresDB() {
 func NewMySQLDB() {
 	once.Do(func() {
 		var err error
-		db, err = sql.Open("mysql", "leandrosc:leandrosc@tcp(localhost:3306)/godb")
+		db, err = sql.Open("mysql", "leandrosc:leandrosc@tcp(localhost:3306)/godb?parseTime=true")
 		if err != nil {
 			log.Fatalf("Can't open db: %v", err)
 		}

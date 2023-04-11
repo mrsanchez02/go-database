@@ -17,6 +17,7 @@ const (
 		updated_at TIMESTAMP
 	)`
 	MySQLCreateProduct = `INSERT INTO products(name, observations, price, created_at) VALUES (?, ?, ?, ?)`
+	MySQLGetAllProduct = `SELECT id, name, observations, price, created_at, updated_at FROM products`
 )
 
 // MySQLProduct user to work with postgres - product
@@ -48,7 +49,7 @@ func (p *MySQLProduct) Migrate() error {
 
 // Create implements interface for product.Storage
 func (p *MySQLProduct) Create(m *product.Model) error {
-	stmt, err := p.db.Prepare(MySQLCreateProduct)
+	stmt, err := p.db.Prepare(MySQLGetAllProduct)
 	if err != nil {
 		return err
 	}
@@ -72,4 +73,32 @@ func (p *MySQLProduct) Create(m *product.Model) error {
 
 	fmt.Printf("Product Id %v created successfully\n", m.ID)
 	return nil
+}
+
+// GetAll implements interface for product.Storage
+func (p *MySQLProduct) GetAll() (product.Models, error) {
+	stmt, err := p.db.Prepare(psqlGetAllProduct)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := stmt.Query()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ms := make(product.Models, 0)
+	for rows.Next() {
+		m, err := scanRowProduct(rows)
+		if err != nil {
+			return nil, err
+		}
+		ms = append(ms, m)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return ms, nil
 }
