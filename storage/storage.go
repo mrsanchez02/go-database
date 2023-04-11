@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 )
 
@@ -30,6 +31,21 @@ func NewPostgresDB() {
 		fmt.Println("Connected to Postgres")
 	})
 
+}
+
+func NewMySQLDB() {
+	once.Do(func() {
+		var err error
+		db, err = sql.Open("mysql", "leandrosc:leandrosc@tcp(localhost:3306)/godb")
+		if err != nil {
+			log.Fatalf("Can't open db: %v", err)
+		}
+
+		if err = db.Ping(); err != nil {
+			log.Fatalf("Can't do ping: %v", err)
+		}
+		fmt.Println("Connected to Mysql")
+	})
 }
 
 // Pool return a unique instancie of db
