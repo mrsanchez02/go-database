@@ -1,6 +1,9 @@
 package invoiceitem
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 // Model of invoiceitem
 type Model struct {
@@ -17,6 +20,7 @@ type Models []*Model
 // Storage interface that must implement a db storage.
 type Storage interface {
 	Migrate() error
+	CreateTx(*sql.Tx, uint, Models) error
 }
 
 // Service of invoiceitem
