@@ -2,7 +2,6 @@ package storage
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/mrsanchez02/go-database/pkg/invoice"
 	"github.com/mrsanchez02/go-database/pkg/invoiceheader"
@@ -32,17 +31,17 @@ func (p *PsqlInvoice) Create(m *invoice.Model) error {
 		return err
 	}
 
-	if err := p.storageHeader.CreateTx(tx, m.Header); err != nil {
-		tx.Rollback()
-		return fmt.Errorf("header: %w", err)
-	}
-	fmt.Printf("Invoice created with id: %d \n", m.Header.ID)
+	// if err := p.storageHeader.CreateTx(tx, m.Header); err != nil {
+	// 	tx.Rollback()
+	// 	return fmt.Errorf("header: %w", err)
+	// }
+	// fmt.Printf("Invoice created with id: %d \n", m.Header.ID)
 
-	if err := p.storageItems.CreateTx(tx, m.Header.ID, m.Items); err != nil {
-		tx.Rollback()
-		return fmt.Errorf("items: %w", err)
-	}
-	fmt.Printf("Items created: %d \n", len(m.Items))
+	// if err := p.storageItems.CreateTx(tx, m.Header.ID, m.Items); err != nil {
+	// 	tx.Rollback()
+	// 	return fmt.Errorf("items: %w", err)
+	// }
+	// fmt.Printf("Items created: %d \n", len(m.Items))
 
 	return tx.Commit()
 
