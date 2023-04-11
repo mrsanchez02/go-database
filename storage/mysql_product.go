@@ -16,8 +16,9 @@ const (
 		created_at TIMESTAMP NOT NULL DEFAULT now(),
 		updated_at TIMESTAMP
 	)`
-	MySQLCreateProduct = `INSERT INTO products(name, observations, price, created_at) VALUES (?, ?, ?, ?)`
-	MySQLGetAllProduct = `SELECT id, name, observations, price, created_at, updated_at FROM products`
+	MySQLCreateProduct  = `INSERT INTO products(name, observations, price, created_at) VALUES (?, ?, ?, ?)`
+	MySQLGetAllProduct  = `SELECT id, name, observations, price, created_at, updated_at FROM products`
+	MySQLGetProductByID = MySQLGetAllProduct + " WHERE id = ?"
 )
 
 // MySQLProduct user to work with postgres - product
@@ -101,4 +102,16 @@ func (p *MySQLProduct) GetAll() (product.Models, error) {
 	}
 
 	return ms, nil
+}
+
+// GetByID implement the interface product.Storage
+func (p *MySQLProduct) GetByID(id uint) (*product.Model, error) {
+	smt, err := p.db.Prepare(MySQLGetProductByID)
+	if err != nil {
+		return &product.Model{}, err
+	}
+
+	defer smt.Close()
+
+	return scanRowProduct(smt.QueryRow(id))
 }
